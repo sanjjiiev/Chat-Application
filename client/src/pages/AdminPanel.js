@@ -1,14 +1,18 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import './AdminPanel.css';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
+
 
 const AdminPanel = () => {
   const [pendingUsers, setPendingUsers] = useState([]);
   const [allUsers, setAllUsers] = useState([]);
-  const [activeTab, setActiveTab] = useState('pending');
+  const [activeTab, setActiveTab] = useState('users');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [roomStats, setRoomStats] = useState([]);
+  const [messageStats, setMessageStats] = useState([]);
+  const [userActivity, setUserActivity] = useState([]);
 
-  // Get token from localStorage
   const getAuthToken = useCallback(() => {
     return localStorage.getItem('token');
   }, []);
@@ -27,31 +31,19 @@ const AdminPanel = () => {
           'Authorization': `Bearer ${token}`
         }
       });
-      
+
       if (response.status === 401) {
         setError('Authentication failed. Please log in again.');
         setLoading(false);
         return;
       }
-      
+
       const data = await response.json();
-      
-      // Ensure data is an array
-      if (Array.isArray(data)) {
-        setPendingUsers(data);
-      } else if (data && data.users && Array.isArray(data.users)) {
-        setPendingUsers(data.users);
-      } else if (data && data.data && Array.isArray(data.data)) {
-        setPendingUsers(data.data);
-      } else {
-        console.error('Unexpected API response format:', data);
-        setPendingUsers([]);
-        setError('Unexpected response format from server');
-      }
+      const usersData = Array.isArray(data) ? data : data.users || data.data || [];
+      setPendingUsers(usersData);
     } catch (error) {
       console.error('Error fetching pending users:', error);
       setPendingUsers([]);
-      setError('Failed to fetch pending users');
     } finally {
       setLoading(false);
     }
@@ -70,32 +62,117 @@ const AdminPanel = () => {
           'Authorization': `Bearer ${token}`
         }
       });
-      
+
       if (response.status === 401) {
         setError('Authentication failed. Please log in again.');
         return;
       }
-      
+
       const data = await response.json();
-      
-      // Ensure data is an array
-      if (Array.isArray(data)) {
-        setAllUsers(data);
-      } else if (data && data.users && Array.isArray(data.users)) {
-        setAllUsers(data.users);
-      } else if (data && data.data && Array.isArray(data.data)) {
-        setAllUsers(data.data);
-      } else {
-        console.error('Unexpected API response format:', data);
-        setAllUsers([]);
-        setError('Unexpected response format from server');
-      }
+      const usersData = Array.isArray(data) ? data : data.users || data.data || [];
+      setAllUsers(usersData);
     } catch (error) {
       console.error('Error fetching all users:', error);
       setAllUsers([]);
-      setError('Failed to fetch all users');
     }
   }, [getAuthToken]);
+
+  const fetchRoomStats = useCallback(async () => {
+    try {
+      const token = getAuthToken();
+      if (!token) {
+        setError('No authentication token found. Please log in again.');
+        return;
+      }
+
+      const response = await fetch('/api/admin/room-stats', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.status === 401) {
+        setError('Authentication failed. Please log in again.');
+        return;
+      }
+
+      const data = await response.json();
+      const statsData = Array.isArray(data) ? data : data.stats || data.data || [];
+      setRoomStats(statsData);
+    } catch (error) {
+      console.error('Error fetching room stats:', error);
+      setRoomStats([]);
+    }
+  }, [getAuthToken]);
+
+  const fetchMessageStats = useCallback(async () => {
+    try {
+      const token = getAuthToken();
+      if (!token) {
+        setError('No authentication token found. Please log in again.');
+        return;
+      }
+
+      const response = await fetch('/api/admin/message-stats', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.status === 401) {
+        setError('Authentication failed. Please log in again.');
+        return;
+      }
+
+      const data = await response.json();
+      const statsData = Array.isArray(data) ? data : data.stats || data.data || [];
+      setMessageStats(statsData);
+    } catch (error) {
+      console.error('Error fetching message stats:', error);
+      setMessageStats([]);
+    }
+  }, [getAuthToken]);
+
+  const fetchUserActivity = useCallback(async () => {
+    try {
+      const token = getAuthToken();
+      if (!token) {
+        setError('No authentication token found. Please log in again.');
+        return;
+      }
+
+      const response = await fetch('/api/admin/user-activity', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.status === 401) {
+        setError('Authentication failed. Please log in again.');
+        return;
+      }
+
+      const data = await response.json();
+      const activityData = Array.isArray(data) ? data : data.activity || data.data || [];
+      setUserActivity(activityData);
+    } catch (error) {
+      console.error('Error fetching user activity:', error);
+      setUserActivity([]);
+    }
+  }, [getAuthToken]);
+
+  useEffect(() => {
+    if (activeTab === 'users') {
+      fetchPendingUsers();
+      fetchAllUsers();
+    } else if (activeTab === 'rooms') {
+      fetchRoomStats();
+    } else if (activeTab === 'messages') {
+      fetchMessageStats();
+    } else if (activeTab === 'activity') {
+      fetchUserActivity();
+    }
+  }, [activeTab, fetchPendingUsers, fetchAllUsers, fetchRoomStats, fetchMessageStats, fetchUserActivity]);
 
   const approveUser = async (userId) => {
     try {
@@ -112,30 +189,21 @@ const AdminPanel = () => {
           'Content-Type': 'application/json'
         }
       });
-      
+
       if (response.ok) {
-        // Filter out the approved user
         setPendingUsers(pendingUsers.filter(user => user._id !== userId));
-        // Refresh all users to see the updated status
-        fetchAllUsers();
+        fetchAllUsers(); // Re-fetch all users to update the list
       } else if (response.status === 401) {
         setError('Authentication failed. Please log in again.');
       } else {
         console.error('Failed to approve user');
-        setError('Failed to approve user');
       }
     } catch (error) {
       console.error('Error approving user:', error);
-      setError('Error approving user');
     }
   };
 
-  useEffect(() => {
-    fetchPendingUsers();
-    fetchAllUsers();
-  }, [fetchPendingUsers, fetchAllUsers]); // Add the functions to the dependency array
-
-  if (loading) {
+  if (loading && activeTab === 'users') {
     return <div className="admin-panel">Loading...</div>;
   }
 
@@ -153,89 +221,277 @@ const AdminPanel = () => {
     <div className="admin-panel">
       <h1>Admin Panel</h1>
       <div className="admin-tabs">
-        <button 
-          className={activeTab === 'pending' ? 'active' : ''}
-          onClick={() => setActiveTab('pending')}
+        <button
+          className={activeTab === 'users' ? 'active' : ''}
+          onClick={() => setActiveTab('users')}
         >
-          Pending Users ({pendingUsers.length})
+          User Management
         </button>
-        <button 
-          className={activeTab === 'all' ? 'active' : ''}
-          onClick={() => setActiveTab('all')}
+        <button
+          className={activeTab === 'rooms' ? 'active' : ''}
+          onClick={() => setActiveTab('rooms')}
         >
-          All Users
+          Room Statistics
+        </button>
+        <button
+          className={activeTab === 'messages' ? 'active' : ''}
+          onClick={() => setActiveTab('messages')}
+        >
+          Message Statistics
+        </button>
+        <button
+          className={activeTab === 'activity' ? 'active' : ''}
+          onClick={() => setActiveTab('activity')}
+        >
+          User Activity
         </button>
       </div>
-      
-      {activeTab === 'pending' && (
-        <div className="pending-users">
-          <h2>Pending Approval</h2>
-          {!Array.isArray(pendingUsers) || pendingUsers.length === 0 ? (
-            <p>No users pending approval</p>
-          ) : (
-            <table>
-              <thead>
-                <tr>
-                  <th>Username</th>
-                  <th>Email</th>
-                  <th>Joined</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {pendingUsers.map(user => (
-                  <tr key={user._id}>
-                    <td>{user.username}</td>
-                    <td>{user.email}</td>
-                    <td>{new Date(user.createdAt).toLocaleDateString()}</td>
-                    <td>
-                      <button 
-                        onClick={() => approveUser(user._id)}
-                        className="approve-btn"
-                      >
-                        Approve
-                      </button>
-                    </td>
+
+      {activeTab === 'users' && (
+        <>
+          <div className="pending-users">
+            <h2>Pending Approval</h2>
+            {!Array.isArray(pendingUsers) || pendingUsers.length === 0 ? (
+              <p>No users pending approval</p>
+            ) : (
+              <table>
+                <thead>
+                  <tr>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Joined</th>
+                    <th>Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {pendingUsers.map(user => (
+                    <tr key={user._id}>
+                      <td>{user.username}</td>
+                      <td>{user.email}</td>
+                      <td>{new Date(user.createdAt).toLocaleDateString()}</td>
+                      <td>
+                        <button
+                          onClick={() => approveUser(user._id)}
+                          className="approve-btn"
+                        >
+                          Approve
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+
+          <div className="all-users">
+            <h2>All Users</h2>
+            {!Array.isArray(allUsers) || allUsers.length === 0 ? (
+              <p>No users found</p>
+            ) : (
+              <table>
+                <thead>
+                  <tr>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Status</th>
+                    <th>Role</th>
+                    <th>Joined</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {allUsers.map(user => (
+                    <tr key={user._id}>
+                      <td>{user.username}</td>
+                      <td>{user.email}</td>
+                      <td>
+                        <span className={`status ${user.isApproved ? 'approved' : 'pending'}`}>
+                          {user.isApproved ? 'Approved' : 'Pending'}
+                        </span>
+                      </td>
+                      <td>{user.isAdmin ? 'Admin' : 'User'}</td>
+                      <td>{new Date(user.createdAt).toLocaleDateString()}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        </>
+      )}
+
+      {activeTab === 'rooms' && (
+        <div className="room-stats">
+          <h2>Room Statistics</h2>
+          {!Array.isArray(roomStats) || roomStats.length === 0 ? (
+            <p>No room statistics available</p>
+          ) : (
+            <>
+              <div className="stats-grid">
+                <div className="stat-card">
+                  <h3>Room Participation</h3>
+                  <div className="chart-container">
+<BarChart
+                width={500}
+                height={300}
+                data={roomStats.slice(0, 5).map(room => ({
+                  name: room.name,
+                  members: room.memberCount,
+                  messages: room.messageCount
+                }))}
+                margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="members" fill="#8884d8" name="Members" />
+                <Bar dataKey="messages" fill="#82ca9d" name="Messages" />
+              </BarChart>
+                  </div>
+                </div>
+                <div className="stat-card">
+                  <h3>Most Active Rooms</h3>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Room Name</th>
+                        <th>Members</th>
+                        <th>Messages</th>
+                        <th>Activity Score</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {roomStats.slice(0, 5).map(room => (
+                        <tr key={room._id}>
+                          <td>{room.name}</td>
+                          <td>{room.memberCount}</td>
+                          <td>{room.messageCount}</td>
+                          <td>{room.activityScore}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div className="stats-grid">
+                <div className="stat-card">
+                  <h3>Room Membership Distribution</h3>
+                  <div className="chart-container">
+                    {/* Pie Chart for Membership Distribution */}
+              <PieChart width={400} height={400}>
+                <Pie
+                  data={roomStats.map(room => ({ name: room.name, value: room.memberCount }))}
+                  dataKey="value"
+                  nameKey="name"
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={100}
+                  fill="#8884d8"
+                  label
+                >
+                  {roomStats.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={['#0088FE', '#00C49F', '#FFBB28', '#FF8042'][index % 4]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+                  </div>
+                </div>
+              </div>
+            </>
           )}
         </div>
       )}
-      
-      {activeTab === 'all' && (
-        <div className="all-users">
-          <h2>All Users</h2>
-          {!Array.isArray(allUsers) || allUsers.length === 0 ? (
-            <p>No users found</p>
+
+      {activeTab === 'messages' && (
+        <div className="message-stats">
+          <h2>Message Statistics</h2>
+          {!Array.isArray(messageStats) || messageStats.length === 0 ? (
+            <p>No message statistics available</p>
           ) : (
-            <table>
-              <thead>
-                <tr>
-                  <th>Username</th>
-                  <th>Email</th>
-                  <th>Status</th>
-                  <th>Role</th>
-                  <th>Joined</th>
-                </tr>
-              </thead>
-              <tbody>
-                {allUsers.map(user => (
-                  <tr key={user._id}>
-                    <td>{user.username}</td>
-                    <td>{user.email}</td>
-                    <td>
-                      <span className={`status ${user.isApproved ? 'approved' : 'pending'}`}>
-                        {user.isApproved ? 'Approved' : 'Pending'}
-                      </span>
-                    </td>
-                    <td>{user.isAdmin ? 'Admin' : 'User'}</td>
-                    <td>{new Date(user.createdAt).toLocaleDateString()}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <>
+              <div className="stats-grid">
+                <div className="stat-card">
+                  <h3>Message Volume</h3>
+                  <div className="chart-container">
+                <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={messageStats}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="roomName" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="totalMessages" fill="#8884d8" name="Total Messages" />
+                  <Bar dataKey="today" fill="#82ca9d" name="Today" />
+                  <Bar dataKey="thisWeek" fill="#ffc658" name="This Week" />
+                </BarChart>
+              </ResponsiveContainer>
+                  </div>
+                </div>
+                <div className="stat-card">
+                  <h3>Message Stats by Room</h3>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Room Name</th>
+                        <th>Total Messages</th>
+                        <th>Today</th>
+                        <th>This Week</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {messageStats.map(stat => (
+                        <tr key={stat.roomId}>
+                          <td>{stat.roomName}</td>
+                          <td>{stat.totalMessages}</td>
+                          <td>{stat.today}</td>
+                          <td>{stat.thisWeek}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+      )}
+
+      {activeTab === 'activity' && (
+        <div className="user-activity">
+          <h2>User Activity</h2>
+          {!Array.isArray(userActivity) || userActivity.length === 0 ? (
+            <p>No user activity data available</p>
+          ) : (
+            <>
+              <div className="stats-grid">
+                <div className="stat-card">
+                  <h3>Most Active Users</h3>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Username</th>
+                        <th>Messages Sent</th>
+                        <th>Last Active</th>
+                        <th>Activity Score</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {userActivity.slice(0, 10).map(user => (
+                        <tr key={user._id}>
+                          <td>{user.username}</td>
+                          <td>{user.messageCount}</td>
+                          <td>{new Date(user.lastActive).toLocaleDateString()}</td>
+                          <td>{user.activityScore}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </>
           )}
         </div>
       )}
