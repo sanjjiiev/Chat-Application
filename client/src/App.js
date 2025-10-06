@@ -6,6 +6,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import AdminPanel from './pages/AdminPanel';
+import Profile from './pages/Profile';
 import './App.css';
 
 function App() {
@@ -19,6 +20,11 @@ function App() {
             <Route path="/admin" element={
               <PrivateRoute adminOnly={true}>
                 <AdminPanel />
+              </PrivateRoute>
+            } />
+            <Route path="/profile" element={ // Add this route
+              <PrivateRoute>
+                <Profile />
               </PrivateRoute>
             } />
             <Route path="/" element={

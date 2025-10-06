@@ -38,6 +38,7 @@ app.use('/api/groups', require('./routes/groups'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/posts', require('./routes/posts'));
 app.use('/api/comments', require('./routes/comments'));
+app.use('/api/profile', require('./routes/profile'));
 
 
 // MongoDB Connection

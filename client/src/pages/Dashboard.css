@@ -479,3 +479,19 @@
   border-radius: 4px;
   font-size: 0.875rem;
 }
+.profile-link {
+  color: var(--reddit-blue);
+  text-decoration: none;
+  padding: 0.4rem 0.8rem;
+  border: 1px solid var(--reddit-blue);
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.profile-link:hover {
+  background-color: var(--reddit-blue);
+  color: white;
+  text-decoration: none;
+}

@@ -127,6 +127,7 @@ const Dashboard = () => {
         <h1>College Chat App</h1>
         <div className="user-info">
           <span>Welcome, {currentUser.username}</span>
+           <a href="/profile" className="profile-link">Profile</a>
           {currentUser.isAdmin && (
             <a href="/admin" className="admin-link">Admin Panel</a>
           )}
