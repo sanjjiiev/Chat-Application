@@ -4,6 +4,8 @@ const cors = require('cors');
 const http = require('http');
 const socketIo = require('socket.io');
 const jwt = require('jsonwebtoken');
+const path = require('path');
+const fs = require('fs');
 const User = require('./models/User');
 const Message = require('./models/Message');
 
@@ -21,12 +23,22 @@ const io = socketIo(server, {
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+// Create uploads directory if it doesn't exist
+const uploadsDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
 
+// Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/users', require('./routes/users'));
 app.use('/api/groups', require('./routes/groups'));
 app.use('/api/admin', require('./routes/admin'));
+app.use('/api/posts', require('./routes/posts'));
+app.use('/api/comments', require('./routes/comments'));
+
 
 // MongoDB Connection
 mongoose.connect(process.env.MONGODB_URI, {
