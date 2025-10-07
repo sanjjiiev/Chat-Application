@@ -36,9 +36,9 @@ router.post('/login', async (req, res) => {
     const { email, password } = req.body;
     
     const user = await User.findOne({ email });
-    if (!user || !(await user.correctPassword(password, user.password))) {
-      return res.status(401).json({ message: 'Invalid credentials' });
-    }
+if (!user || !(await user.comparePassword(password))) {
+  return res.status(400).json({ message: 'Invalid credentials' });
+}
     
     if (!user.isApproved) {
       return res.status(401).json({ message: 'Account not approved yet' });
