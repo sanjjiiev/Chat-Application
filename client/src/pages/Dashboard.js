@@ -14,6 +14,7 @@ const Dashboard = () => {
   const [postsLoading, setPostsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('chat');
+  const [darkMode, setDarkMode] = useState(false); // <-- Dark mode state
   const { currentUser, logout } = useAuth();
 
   useEffect(() => {
@@ -25,7 +26,7 @@ const Dashboard = () => {
     try {
       setLoading(true);
       setError(null);
-      
+
       const token = localStorage.getItem('token');
       if (!token) {
         setError('No authentication token found. Please log in again.');
@@ -38,15 +39,15 @@ const Dashboard = () => {
           'Authorization': `Bearer ${token}`
         }
       });
-      
+
       if (response.status === 401) {
         setError('Authentication failed. Please log in again.');
         setLoading(false);
         return;
       }
-      
+
       const data = await response.json();
-      
+
       if (Array.isArray(data)) {
         setGroups(data);
       } else if (data && data.groups && Array.isArray(data.groups)) {
@@ -76,7 +77,7 @@ const Dashboard = () => {
           'Authorization': `Bearer ${token}`
         }
       });
-      
+
       if (response.ok) {
         const postsData = await response.json();
         setPosts(postsData);
@@ -101,7 +102,7 @@ const Dashboard = () => {
           'Authorization': `Bearer ${token}`
         }
       });
-      
+
       if (response.ok) {
         const updatedPost = await response.json();
         setPosts(posts.map(post => 
@@ -121,17 +122,25 @@ const Dashboard = () => {
     fetchGroups();
   };
 
+  const toggleDarkMode = () => {
+    setDarkMode(!darkMode);
+  };
+
   return (
-    <div className="dashboard">
+    <div className={`dashboard ${darkMode ? 'dark-mode' : ''}`}> {/* Apply dark-mode class */}
       <header className="dashboard-header">
         <h1>College Chat App</h1>
         <div className="user-info">
           <span>Welcome, {currentUser.username}</span>
-           <a href="/profile" className="profile-link">Profile</a>
+          <a href="/profile" className="profile-link">Profile</a>
           {currentUser.isAdmin && (
             <a href="/admin" className="admin-link">Admin Panel</a>
           )}
           <button onClick={handleLogout}>Logout</button>
+          {/* Dark Mode Toggle Button */}
+          <button onClick={toggleDarkMode} className="dark-mode-toggle">
+            {darkMode ? 'Light Mode' : 'Dark Mode'}
+          </button>
         </div>
       </header>
 
@@ -160,14 +169,12 @@ const Dashboard = () => {
           </div>
         ) : (
           <>
-            {/* Groups sidebar - always visible */}
             <GroupList 
               groups={groups} 
               selectedGroup={selectedGroup}
               onSelectGroup={setSelectedGroup}
             />
-            
-            {/* Main content area - changes based on active tab */}
+
             <div className="main-content">
               {activeTab === 'chat' && (
                 <div className="chat-window-container">
@@ -190,11 +197,10 @@ const Dashboard = () => {
                   )}
                 </div>
               )}
-              
+
               {activeTab === 'posts' && (
                 <div className="posts-container">
                   <PostForm onPostCreated={handlePostCreated} />
-                  
                   {postsLoading ? (
                     <div className="loading">Loading posts...</div>
                   ) : (
@@ -204,7 +210,6 @@ const Dashboard = () => {
                       currentUserId={currentUser._id || currentUser.id}
                     />
                   )}
-                  
                   {posts.length === 0 && !postsLoading && (
                     <div className="no-posts">
                       <p>No posts yet. Be the first to share something!</p>

@@ -32,9 +32,9 @@ const PostItem = ({ post, onVote, onComment }) => {
       </div>
       
       <div className="post-content">
-        <h4>{post.title}</h4>
-        {post.content && <p>{post.content}</p>}
-        
+        <h1>{post.title}</h1>
+        {post.content && <h3>{post.content}</h3>}
+        <div className="post-media-container">
         {post.media && post.mediaType === 'image' && (
           <img src={post.media} alt="Post media" className="post-media" />
         )}
@@ -44,7 +44,7 @@ const PostItem = ({ post, onVote, onComment }) => {
             <source src={post.media} type="video/mp4" />
           </video>
         )}
-        
+        </div>
         <div className="post-meta">
           <span>Posted by {post.author.username}</span>
           <span>{new Date(post.createdAt).toLocaleDateString()}</span>

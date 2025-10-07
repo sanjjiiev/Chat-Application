@@ -1,68 +1,188 @@
+/* ================= Group List ================= */
 .group-list {
-  width: 300px;
-  background-color: #fff;
-  border-right: 1px solid #ddd;
-  height: 100vh;
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  padding: 1rem;
+  box-sizing: border-box;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  transition: background-color 0.3s, color 0.3s;
 }
 
 .group-list h2 {
-  padding: 1rem;
-  background-color: #f8f9fa;
-  border-bottom: 1px solid #ddd;
+  margin: 0 0 0.5rem 0;
+  color: #24292f;
+  font-size: 1.5rem;
+  font-weight: 600;
+  transition: color 0.3s;
 }
 
 .group-search {
+  padding: 0.5rem 0.75rem;
+  border-radius: 20px;
+  border: 1px solid #d1d5da;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s, background-color 0.3s, color 0.3s;
   width: 100%;
-  padding: 0.5rem;
-  border: none;
-  border-bottom: 1px solid #ddd;
+  background-color: #fff;
+  color: #24292f;
+}
+
+.group-search:focus {
+  border-color: #0366d6;
+  box-shadow: 0 0 0 2px rgba(3, 102, 214, 0.2);
 }
 
 .groups {
-  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
 }
 
 .group-item {
+  background-color: #fff;
   padding: 1rem;
-  border-bottom: 1px solid #eee;
+  border-radius: 8px;
+  border: 1px solid #e1e4e8;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: transform 0.1s, box-shadow 0.2s, border-color 0.2s, background-color 0.3s, color 0.3s;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  position: relative;
 }
 
 .group-item:hover {
-  background-color: #f8f9fa;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  border-color: #0366d6;
 }
 
 .group-item.selected {
-  background-color: #e3f2fd;
+  border-color: #0366d6;
+  box-shadow: 0 0 0 2px rgba(3, 102, 214, 0.2);
 }
 
 .group-item h3 {
-  margin-bottom: 0.5rem;
+  margin: 0;
+  font-size: 1.2rem;
+  color: #24292f;
+  transition: color 0.3s;
 }
 
 .group-item p {
-  color: #666;
-  font-size: 0.9rem;
-  margin-bottom: 0.5rem;
+  margin: 0;
+  font-size: 0.95rem;
+  color: #586069;
+  transition: color 0.3s;
 }
 
 .group-category {
-  display: inline-block;
-  background-color: #e9ecef;
-  padding: 0.2rem 0.5rem;
-  border-radius: 12px;
-  font-size: 0.8rem;
-  color: #495057;
+  font-size: 0.85rem;
+  color: #0366d6;
+  font-weight: 500;
+  transition: color 0.3s;
 }
 
 .join-btn {
-  margin-top: 0.5rem;
-  padding: 0.3rem 0.7rem;
-  background-color: #28a745;
-  color: white;
+  position: absolute;
+  right: 1rem;
+  top: 1rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: 20px;
   border: none;
-  border-radius: 4px;
+  background-color: #28a745;
+  color: #fff;
+  font-weight: 600;
   cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.join-btn:hover {
+  background-color: #218838;
+  transform: translateY(-1px);
+}
+
+.member-badge {
+  position: absolute;
+  right: 1rem;
+  top: 1rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 12px;
+  background-color: #e1e4e8;
+  color: #586069;
+  font-size: 0.8rem;
+  font-weight: 500;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+/* ================= Dark Mode ================= */
+.dark-mode .group-list {
+  background-color: #18191a;
+}
+
+.dark-mode .group-list h2 {
+  color: #e4e6eb;
+}
+
+.dark-mode .group-search {
+  background-color: #242526;
+  color: #e4e6eb;
+  border-color: #3a3b3c;
+}
+
+.dark-mode .group-item {
+  background-color: #242526;
+  border-color: #3a3b3c;
+  color: #e4e6eb;
+}
+
+.dark-mode .group-item h3 {
+  color: #e4e6eb;
+}
+
+.dark-mode .group-item p {
+  color: #b0b3b8;
+}
+
+.dark-mode .group-category {
+  color: #58a6ff;
+}
+
+.dark-mode .join-btn {
+  background-color: #28a745;
+}
+
+.dark-mode .join-btn:hover {
+  background-color: #218838;
+}
+
+.dark-mode .member-badge {
+  background-color: #3a3b3c;
+  color: #e4e6eb;
+}
+
+/* ================= Responsive Design ================= */
+@media (max-width: 768px) {
+  .group-item {
+    padding: 0.75rem;
+  }
+
+  .join-btn, .member-badge {
+    top: 0.75rem;
+    right: 0.75rem;
+  }
+
+  .group-item h3 {
+    font-size: 1rem;
+  }
+
+  .group-item p {
+    font-size: 0.9rem;
+  }
 }

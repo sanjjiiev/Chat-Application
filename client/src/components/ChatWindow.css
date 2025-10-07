@@ -1,12 +1,14 @@
-/* ChatWindow.css */
+/* ================= ChatWindow.css ================= */
 .chat-window-full {
   display: flex;
   flex-direction: column;
   height: 100vh;
   width: 100%;
   background-color: #f0f2f5;
+  transition: background-color 0.3s, color 0.3s;
 }
 
+/* ================= No Group Selected ================= */
 .no-group-selected {
   display: flex;
   justify-content: center;
@@ -16,6 +18,7 @@
   font-size: 1.2rem;
 }
 
+/* ================= Chat Header ================= */
 .chat-header {
   display: flex;
   align-items: center;
@@ -23,6 +26,7 @@
   background-color: #fff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   z-index: 10;
+  transition: background-color 0.3s, color 0.3s;
 }
 
 .back-button {
@@ -52,10 +56,11 @@
 
 .group-info p {
   margin: 0;
-  color: #65676b;
+  color: #000000;
   font-size: 0.9rem;
 }
 
+/* ================= Messages ================= */
 .messages-container {
   flex: 1;
   overflow-y: auto;
@@ -64,6 +69,7 @@
   flex-direction: column;
   gap: 15px;
   background-color: #f0f2f5;
+  transition: background-color 0.3s;
 }
 
 .no-messages {
@@ -82,6 +88,7 @@
   border-radius: 18px;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
   align-self: flex-start;
+  transition: background-color 0.3s, color 0.3s;
 }
 
 .own-message {
@@ -135,6 +142,7 @@
   line-height: 1.4;
 }
 
+/* ================= Media ================= */
 .message-image img {
   max-width: 100%;
   max-height: 300px;
@@ -178,15 +186,13 @@
   opacity: 0.8;
 }
 
-.scroll-anchor {
-  height: 1px;
-}
-
+/* ================= Form ================= */
 .message-form {
   padding: 15px 20px;
   background-color: #fff;
   box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
   position: relative;
+  transition: background-color 0.3s;
 }
 
 .message-input-container {
@@ -216,7 +222,7 @@
   border-radius: 20px;
   font-size: 1rem;
   outline: none;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, background-color 0.3s, color 0.3s;
 }
 
 .message-input:focus {
@@ -245,6 +251,7 @@
   cursor: not-allowed;
 }
 
+/* ================= Emoji Picker ================= */
 .emoji-picker-container {
   position: absolute;
   bottom: 70px;
@@ -255,7 +262,7 @@
   overflow: hidden;
 }
 
-/* Scrollbar styling */
+/* ================= Scrollbar ================= */
 .messages-container::-webkit-scrollbar {
   width: 8px;
 }
@@ -274,7 +281,90 @@
   background: #a8a8a8;
 }
 
-/* Responsive design */
+/* ================= Dark Mode ================= */
+.dark-mode .chat-window-full {
+  background-color: #18191a;
+  color: #e4e6eb;
+}
+
+.dark-mode .chat-header {
+  background-color: #242526;
+  color: #e4e6eb;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.dark-mode .back-button {
+  color: #4e9af1;
+}
+
+.dark-mode .back-button:hover {
+  background-color: #3a3b3c;
+}
+
+.dark-mode .messages-container {
+  background-color: #18191a;
+}
+
+.dark-mode .message {
+  background-color: #242526;
+  color: #e4e6eb;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.dark-mode .own-message {
+  background-color: #3a3b3c;
+  color: #e4e6eb;
+}
+
+.dark-mode .message-input,
+.dark-mode .message-form {
+  background-color: #242526;
+  border-color: #3a3b3c;
+  color: #e4e6eb;
+}
+
+.dark-mode .emoji-btn:hover,
+.dark-mode .upload-btn:hover {
+  background-color: #3a3b3c;
+}
+
+.dark-mode .send-btn {
+  background-color: #4e9af1;
+}
+
+.dark-mode .send-btn:hover:not(:disabled) {
+  background-color: #3a7bd1;
+}
+
+.dark-mode .message-time {
+  color: #b0b3b8;
+}
+
+.dark-mode .message-sender {
+  color: #58a6ff;
+}
+
+.dark-mode .delete-message-btn {
+  color: #ff6b6b;
+}
+
+.dark-mode .message-file a {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #e4e6eb;
+}
+
+.dark-mode .file-size {
+  opacity: 0.7;
+}
+
+.dark-mode  .group-info h2 {
+  margin: 0;
+  color: #fbf5f5;
+  font-size: 1.5rem;
+}
+
+/* ================= Responsive Design ================= */
 @media (max-width: 768px) {
   .chat-header {
     padding: 12px 15px;
@@ -307,33 +397,4 @@
   .send-btn {
     padding: 8px 16px;
   }
-}
-
-/* Add to ChatWindow.css for better error handling */
-.message-sender {
-  font-weight: bold;
-  color: #007bff;
-}
-
-.unknown-sender {
-  font-style: italic;
-  color: #999;
-}
-
-.own-message {
-  background-color: #e3f2fd;
-  align-self: flex-end;
-}
-
-.delete-message-btn {
-  background: none;
-  border: none;
-  color: #dc3545;
-  cursor: pointer;
-  font-size: 18px;
-  margin-left: 10px;
-}
-
-.delete-message-btn:hover {
-  color: #c82333;
 }

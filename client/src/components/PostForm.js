@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import './PostForm.css'
 
 const PostForm = ({ onPostCreated }) => {
   const [title, setTitle] = useState('');

@@ -1,0 +1,19 @@
+/* ================= Post List ================= */
+.post-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem; /* Space between posts */
+  width: 100%;
+  max-width: 100%; /* Ensure it stretches full width */
+  padding: 1rem;
+  box-sizing: border-box;
+  background-color: #f5f6fa; /* Optional: subtle background for the feed */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .post-list {
+    padding: 0.5rem;
+    gap: 1rem;
+  }
+}

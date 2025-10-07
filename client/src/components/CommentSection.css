@@ -1,0 +1,131 @@
+/* ================= Comment Section ================= */
+.comment-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+  margin-top: 1rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* ================= Comment Form ================= */
+.comment-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.comment-form textarea {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  border: 1px solid #e1e4e8;
+  font-size: 0.95rem;
+  resize: vertical;
+  min-height: 70px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.comment-form textarea:focus {
+  border-color: #0366d6;
+  box-shadow: 0 0 0 2px rgba(3, 102, 214, 0.2);
+}
+
+.comment-form button {
+  align-self: flex-end;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  border: none;
+  background-color: #0366d6;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.comment-form button:hover {
+  background-color: #024c9b;
+  transform: translateY(-1px);
+}
+
+.comment-form button:disabled {
+  background-color: #a8c5f0;
+  cursor: not-allowed;
+}
+
+/* ================= Comments List ================= */
+.comments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* ================= Responsive Design ================= */
+@media (max-width: 768px) {
+  .comment-form textarea {
+    font-size: 0.9rem;
+    min-height: 60px;
+  }
+
+  .comment-form button {
+    padding: 0.4rem 0.85rem;
+  }
+}
+
+/* ================= Comment Section Dark Mode ================= */
+.dashboard.dark-mode .comment-section {
+  color: #e4e6eb;
+}
+
+.dashboard.dark-mode .comment-form textarea {
+  background-color: #2c2c2c;
+  color: #e4e6eb;
+  border: 1px solid #555;
+}
+
+.dashboard.dark-mode .comment-form textarea:focus {
+  border-color: #58a6ff;
+  box-shadow: 0 0 0 2px rgba(88, 166, 255, 0.2);
+}
+
+.dashboard.dark-mode .comment-form button {
+  background-color: #0366d6;
+  color: #fff;
+}
+
+.dashboard.dark-mode .comment-form button:hover {
+  background-color: #024c9b;
+}
+
+.dashboard.dark-mode .comment-form button:disabled {
+  background-color: #3a5f91;
+  cursor: not-allowed;
+}
+
+.dashboard.dark-mode .comments-list {
+  gap: 0.75rem;
+  color: #e4e6eb;
+}
+
+/* Optional: nested comments background for clarity */
+.dashboard.dark-mode .comments-list .comment-item {
+  background-color: #1e1e1e;
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #333;
+}
+
+/* Responsive adjustments inherit dark mode */
+@media (max-width: 768px) {
+  .dashboard.dark-mode .comment-form textarea {
+    font-size: 0.9rem;
+    min-height: 60px;
+  }
+
+  .dashboard.dark-mode .comment-form button {
+    padding: 0.4rem 0.85rem;
+  }
+}
+

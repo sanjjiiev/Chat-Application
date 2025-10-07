@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import './CommentItem.css';
 
 const CommentItem = ({ comment, depth, onReply, onVote }) => {
   const [showReplyForm, setShowReplyForm] = useState(false);

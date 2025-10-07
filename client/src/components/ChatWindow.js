@@ -87,14 +87,23 @@ const ChatWindow = ({ group, onBack }) => {
       };
     }
   }, [group, fetchMessages]);
+const scrollToBottom = () => {
+  const container = messagesEndRef.current?.parentNode;
+  if (!container) return;
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+  // Calculate how far the user is from the bottom
+  const distanceFromBottom = container.scrollHeight - container.scrollTop - container.clientHeight;
 
-  const scrollToBottom = () => {
+  // Only scroll if the user is near the bottom (threshold: 50px)
+  if (distanceFromBottom < 50) {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+  }
+};
+
+// Update useEffect
+useEffect(() => {
+  scrollToBottom();
+}, [messages]);
 
   const handleSendMessage = (e) => {
     e.preventDefault();
