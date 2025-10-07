@@ -12,6 +12,8 @@ const AdminPanel = () => {
   const [roomStats, setRoomStats] = useState([]);
   const [messageStats, setMessageStats] = useState([]);
   const [userActivity, setUserActivity] = useState([]);
+  const [postStats, setPostStats] = useState([]);
+
 
   const getAuthToken = useCallback(() => {
     return localStorage.getItem('token');
@@ -76,6 +78,33 @@ const AdminPanel = () => {
       setAllUsers([]);
     }
   }, [getAuthToken]);
+  const fetchPostStats = useCallback(async () => {
+  try {
+    const token = getAuthToken();
+    if (!token) {
+      setError('No authentication token found. Please log in again.');
+      return;
+    }
+
+    const response = await fetch('/api/admin/post-stats', {  // we’ll create this route
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    if (response.status === 401) {
+      setError('Authentication failed. Please log in again.');
+      return;
+    }
+
+    const data = await response.json();
+    setPostStats(Array.isArray(data) ? data : data.posts || data.data || []);
+  } catch (error) {
+    console.error('Error fetching post stats:', error);
+    setPostStats([]);
+  }
+}, [getAuthToken]);
+
 
   const fetchRoomStats = useCallback(async () => {
     try {
@@ -171,8 +200,10 @@ const AdminPanel = () => {
       fetchMessageStats();
     } else if (activeTab === 'activity') {
       fetchUserActivity();
-    }
-  }, [activeTab, fetchPendingUsers, fetchAllUsers, fetchRoomStats, fetchMessageStats, fetchUserActivity]);
+    }else if (activeTab === 'posts') {
+    fetchPostStats();
+  }
+  }, [activeTab, fetchPendingUsers, fetchAllUsers, fetchRoomStats, fetchMessageStats, fetchUserActivity,fetchPostStats]);
 
   const approveUser = async (userId) => {
     try {
@@ -245,6 +276,13 @@ const AdminPanel = () => {
         >
           User Activity
         </button>
+        <button
+  className={activeTab === 'posts' ? 'active' : ''}
+  onClick={() => setActiveTab('posts')}
+>
+  Posts Statistics
+</button>
+
       </div>
 
       {activeTab === 'users' && (
@@ -495,6 +533,75 @@ const AdminPanel = () => {
           )}
         </div>
       )}
+      {activeTab === 'posts' && (
+  <div className="post-stats">
+    <h2>Posts Statistics</h2>
+    {!Array.isArray(postStats) || postStats.length === 0 ? (
+      <p>No post data available</p>
+    ) : (
+      <>
+        <div className="stats-grid">
+          <div className="stat-card">
+            <h3>Top Posts by Score</h3>
+            <BarChart width={500} height={300} data={postStats.slice(0, 5)}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="title" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="score" fill="#8884d8" name="Score" />
+            </BarChart>
+          </div>
+
+          <div className="stat-card">
+            <h3>Media Type Distribution</h3>
+            <PieChart width={400} height={400}>
+              <Pie
+                data={[
+                  { name: 'Images', value: postStats.filter(p => p.mediaType === 'image').length },
+                  { name: 'Videos', value: postStats.filter(p => p.mediaType === 'video').length },
+                  { name: 'None', value: postStats.filter(p => p.mediaType === 'none').length }
+                ]}
+                dataKey="value"
+                nameKey="name"
+                cx="50%"
+                cy="50%"
+                outerRadius={100}
+                fill="#82ca9d"
+                label
+              >
+                {['#0088FE', '#00C49F', '#FFBB28'].map((color, index) => (
+                  <Cell key={index} fill={color} />
+                ))}
+              </Pie>
+              <Tooltip />
+            </PieChart>
+          </div>
+        </div>
+
+        <div className="stats-grid">
+          <div className="stat-card">
+            <h3>Posts per User</h3>
+            <BarChart width={500} height={300} data={postStats.reduce((acc, post) => {
+              const user = acc.find(u => u.username === post.author.username);
+              if (user) user.count += 1;
+              else acc.push({ username: post.author.username, count: 1 });
+              return acc;
+            }, [])}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="username" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="count" fill="#FF8042" name="Posts" />
+            </BarChart>
+          </div>
+        </div>
+      </>
+    )}
+  </div>
+)}
+
     </div>
   );
 };

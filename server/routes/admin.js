@@ -5,6 +5,7 @@ const admin = require('../middleware/admin');
 const Group = require('../models/Group');
 const Message = require('../models/Message');
 const User = require('../models/User');
+const Post = require('../models/Post');
 
 const router = express.Router();
 
@@ -93,6 +94,18 @@ router.get('/message-stats', auth, admin, async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
+// Get post statistics
+router.get('/post-stats', auth, admin, async (req, res) => {
+  try {
+    const posts = await Post.find()
+      .populate('author', 'username') // get author's username
+      .sort({ score: -1 }); // top posts first
+    res.json(posts);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 
 // Get user activity
 router.get('/user-activity', auth, admin, async (req, res) => {
@@ -130,5 +143,6 @@ router.get('/user-activity', auth, admin, async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
+
 
 module.exports = router;

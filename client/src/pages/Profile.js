@@ -2,6 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import './Profile.css';
+import {
+  PieChart, Pie, Cell, Tooltip, Legend,
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer
+} from 'recharts';
 
 const Profile = () => {
   const [profile, setProfile] = useState(null);
@@ -182,6 +186,39 @@ const Profile = () => {
       </div>
     );
   }
+  
+
+// Inside your component, before return()
+const karmaData = [
+  { name: 'Post Karma', value: karma.postKarma },
+  { name: 'Comment Karma', value: karma.commentKarma }
+];
+const COLORS = ['#0088FE', '#00C49F'];
+
+// Prepare posts/comments activity per day
+const activityData = [];
+const allDates = [...userPosts.map(p => p.createdAt), ...userComments.map(c => c.createdAt)];
+const dateMap = {};
+
+allDates.forEach(date => {
+  const day = new Date(date).toLocaleDateString();
+  dateMap[day] = dateMap[day] || { posts: 0, comments: 0 };
+});
+
+userPosts.forEach(p => {
+  const day = new Date(p.createdAt).toLocaleDateString();
+  dateMap[day].posts += 1;
+});
+
+userComments.forEach(c => {
+  const day = new Date(c.createdAt).toLocaleDateString();
+  dateMap[day].comments += 1;
+});
+
+for (const day in dateMap) {
+  activityData.push({ date: day, posts: dateMap[day].posts, comments: dateMap[day].comments });
+}
+
 
   return (
     <div className="profile-page">
@@ -209,14 +246,16 @@ const Profile = () => {
                     />
                   </div>
                   <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleFileChange}
-                    className="file-input"
-                  />
-                  <label className="upload-label">
-                    Change Photo
-                  </label>
+                type="file"
+                id="profilePhoto"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  style={{ display: 'none' }}
+                />
+                <label htmlFor="profilePhoto" className="upload-label">
+                  Change Photo
+                </label>
+
                 </div>
               ) : (
                 <div className="profile-photo">
@@ -501,6 +540,44 @@ const Profile = () => {
           )}
         </div>
       </div>
+      <div className="profile-visualization">
+  <h2>Visualizations</h2>
+
+  <div className="charts-container">
+    {/* Karma Pie Chart */}
+    <div className="chart-card">
+      <h3>Karma Breakdown</h3>
+      <ResponsiveContainer width="100%" height={250}>
+        <PieChart>
+          <Pie data={karmaData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} label>
+            {karmaData.map((entry, index) => (
+              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+            ))}
+          </Pie>
+          <Tooltip />
+          <Legend />
+        </PieChart>
+      </ResponsiveContainer>
+    </div>
+
+    {/* Posts & Comments Bar Chart */}
+    <div className="chart-card">
+      <h3>Posts & Comments Activity</h3>
+      <ResponsiveContainer width="100%" height={250}>
+        <BarChart data={activityData}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="date" />
+          <YAxis />
+          <Tooltip />
+          <Legend />
+          <Bar dataKey="posts" fill="#8884d8" />
+          <Bar dataKey="comments" fill="#82ca9d" />
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
+  </div>
+</div>
+
     </div>
   );
 };
