@@ -23,7 +23,10 @@ It allows students to **connect, post updates, join discussions, and collaborate
 - Edit or delete your own posts  
 
 ###  Chat Groups 
-- Join topic-based chat groups (e.g. “Culturals”, “Hackathons”, “Placement Prep”)  
+- Predefined room categories: *Study Groups, Events, Courses, Clubs, General*
+- Join/Leave functionality with membership validation
+- Admin-controlled moderation system
+- Room participation statistics and pie chart visualization
 - Real-time chat powered by **Socket.io**
 
 ###  Search & Discovery
@@ -36,11 +39,11 @@ It allows students to **connect, post updates, join discussions, and collaborate
 
 | Layer | Technology |
 |-------|-------------|
-| **Frontend** | React.js, Tailwind CSS |
-| **Backend** | Node.js, Express.js |
-| **Database** | MongoDB  |
-| **Authentication** | JWT (JSON Web Token) |
-| **Hosting** | Vercel (Frontend) & Render/Heroku (Backend) |
+| Frontend | React.js, Tailwind CSS, Chart.js / Recharts |
+| Backend | Node.js, Express.js |
+| Database | MongoDB |
+| Authentication | JWT, bcrypt |
+| Real-time Chat | Socket.io |
 
 ---
 
